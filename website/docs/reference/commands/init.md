@@ -84,10 +84,10 @@ Scans for newly installed AI CLIs not yet in your config and prompts you to add 
 
 ```bash
 skillshare init -p --discover           # Interactive selection
-skillshare init -p --discover --select gemini  # Non-interactive
+skillshare init -p --discover --select antigravity  # Non-interactive
 ```
 
-Scans the project directory for new AI CLI directories (e.g., `.gemini/`) and adds them as targets.
+Scans the project directory for new AI CLI directories (e.g., `.agents/`) and adds them as targets.
 
 ### Discover + Mode behavior
 

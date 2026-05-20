@@ -9,6 +9,18 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.19.14] - 2026-05-20
+
+### Refactoring
+
+- **Unified Gemini and Antigravity targets** — the standalone `gemini` target has been merged into `antigravity`. The shared skill path `~/.gemini/skills` is now served by the `antigravity` target. Old names `gemini`, `gemini-cli`, and `antigravity-cli` continue to work as aliases
+
+### Bug Fixes
+
+- **Audit: Swift files are now scannable** — `.swift` files are included in security audit scans alongside `.go`, `.py`, `.ts`, and other source files
+- **Audit: reduced false positives** — tightened publisher-claim extraction to avoid flagging ordinary phrases like "from CSV data" as organization claims. Bracket placeholders like `[Count] ([Percentage]%)` no longer trigger dangling-link warnings. Common documentation domains (MDN, Apple Developer, etc.) are excluded from external-link findings
+- **Audit: uppercase URI schemes no longer flag as dangling links** — custom URI schemes like `VSCode://` are now correctly recognized as external links
+
 ## [0.19.13] - 2026-05-17
 
 ### Bug Fixes

@@ -142,7 +142,7 @@ They are complementary — backup protects targets from sync changes, trash prot
 
 ### Can I sync specific skills to specific CLIs?
 
-Yes. For example, skill A only to Claude, skill B to Gemini and Codex, skill C to all:
+Yes. For example, skill A only to Claude, skill B to Antigravity and Codex, skill C to all:
 
 **Option 1: `targets` field in SKILL.md** (set by skill author)
 
@@ -158,7 +158,7 @@ targets: [claude]
 # skills/skill-b/SKILL.md
 ---
 name: skill-b
-targets: [gemini, codex]
+targets: [antigravity, codex]
 ---
 ```
 
@@ -219,7 +219,7 @@ Keep the universal target in **merge mode** (default) for the safest coexistence
 
 ### I used `claude-code` (or `gemini-cli`, etc.) as a project target — is that still valid?
 
-Yes. Old project target names like `claude-code`, `gemini-cli`, `github-copilot` still resolve via aliases. However, the canonical name is now the same as the global name (e.g., `claude`, `gemini`, `copilot`). We recommend updating your `.skillshare/config.yaml` to use the short name:
+Yes. Old project target names like `claude-code`, `gemini-cli`, `github-copilot` still resolve via aliases. For example, `gemini` and `gemini-cli` now resolve to `antigravity`. We recommend updating your `.skillshare/config.yaml` to use the canonical name:
 
 ```yaml
 # Before
