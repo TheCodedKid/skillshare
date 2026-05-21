@@ -17,11 +17,22 @@ type targetPathPair struct {
 	Project string `yaml:"project"`
 }
 
+// targetAlsoScans lists additional filesystem paths a target's runtime is
+// known to scan beyond its primary skills path. Sourced from each tool's
+// official documentation. Used by `skillshare doctor` to warn about
+// cross-target discovery overlap (e.g. Codex's runtime scans ~/.agents/skills
+// even though its primary skillshare path is ~/.codex/skills).
+type targetAlsoScans struct {
+	Global  []string `yaml:"global,omitempty"`
+	Project []string `yaml:"project,omitempty"`
+}
+
 type targetSpec struct {
-	Name    string         `yaml:"name"`
-	Skills  targetPathPair `yaml:"skills"`
-	Agents  targetPathPair `yaml:"agents,omitempty"`
-	Aliases []string       `yaml:"aliases,omitempty"`
+	Name      string          `yaml:"name"`
+	Skills    targetPathPair  `yaml:"skills"`
+	Agents    targetPathPair  `yaml:"agents,omitempty"`
+	AlsoScans targetAlsoScans `yaml:"also_scans,omitempty"`
+	Aliases   []string        `yaml:"aliases,omitempty"`
 }
 
 type targetsFile struct {
@@ -126,6 +137,53 @@ func ProjectAgentTargets() map[string]TargetConfig {
 	}
 
 	return targets
+}
+
+// AlsoScansGlobal returns the additional filesystem paths a target's runtime
+// scans in global mode beyond its primary skills path. Paths are tilde-expanded
+// and OS-normalised. Returns nil for unknown targets or targets without
+// also_scans metadata.
+func AlsoScansGlobal(name string) []string {
+	specs, err := loadTargetSpecs()
+	if err != nil {
+		return nil
+	}
+	for _, spec := range specs {
+		if spec.Name != name {
+			continue
+		}
+		if len(spec.AlsoScans.Global) == 0 {
+			return nil
+		}
+		paths := make([]string, len(spec.AlsoScans.Global))
+		for i, p := range spec.AlsoScans.Global {
+			paths[i] = normalizeTargetPath(p)
+		}
+		return paths
+	}
+	return nil
+}
+
+// AlsoScansProject returns the project-mode equivalent of AlsoScansGlobal.
+func AlsoScansProject(name string) []string {
+	specs, err := loadTargetSpecs()
+	if err != nil {
+		return nil
+	}
+	for _, spec := range specs {
+		if spec.Name != name {
+			continue
+		}
+		if len(spec.AlsoScans.Project) == 0 {
+			return nil
+		}
+		paths := make([]string, len(spec.AlsoScans.Project))
+		for i, p := range spec.AlsoScans.Project {
+			paths[i] = normalizeTargetPath(p)
+		}
+		return paths
+	}
+	return nil
 }
 
 // LookupProjectTarget returns the known project target config for a name.

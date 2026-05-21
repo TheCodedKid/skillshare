@@ -12,10 +12,15 @@ targets:
     skills:
       global: "~/.config/agents/skills"
       project: ".agents/skills"
+    also_scans:
+      global: ["~/.claude/skills"]
+      project: [".claude/skills"]
   - name: antigravity
     skills:
       global: "~/.gemini/skills"
       project: ".agents/skills"
+    also_scans:
+      global: ["~/.agents/skills"]
     aliases: [gemini, gemini-cli, antigravity-cli]
   - name: aiderdesk
     skills:
@@ -71,6 +76,8 @@ targets:
     skills:
       global: "~/.codex/skills"
       project: ".agents/skills"
+    also_scans:
+      global: ["~/.agents/skills"]
   - name: commandcode
     skills:
       global: "~/.commandcode/skills"
@@ -100,6 +107,9 @@ targets:
     agents:
       global: "~/.cursor/agents"
       project: ".cursor/agents"
+    also_scans:
+      global: ["~/.agents/skills", "~/.claude/skills", "~/.codex/skills"]
+      project: [".claude/skills", ".codex/skills"]
   - name: deepagents
     skills:
       global: "~/.deepagents/agent/skills"
@@ -122,6 +132,8 @@ targets:
     skills:
       global: "~/.firebender/skills"
       project: ".firebender/skills"
+    also_scans:
+      global: ["~/.agents/skills", "~/.claude/skills", "~/.codex/skills", "~/.cursor/skills", "~/.goose/skills"]
   - name: forgecode
     skills:
       global: "~/forge/skills"
@@ -154,6 +166,9 @@ targets:
     skills:
       global: "~/.config/agents/skills"
       project: ".agents/skills"
+    also_scans:
+      global: ["~/.agents/skills", "~/.claude/skills", "~/.codex/skills"]
+      project: [".claude/skills", ".codex/skills"]
     aliases: [kimi-cli]
   - name: kiro
     skills:
@@ -230,6 +245,9 @@ targets:
     skills:
       global: "~/.roo/skills"
       project: ".roo/skills"
+    also_scans:
+      global: ["~/.agents/skills"]
+      project: [".agents/skills"]
   - name: rovodev
     skills:
       global: "~/.rovodev/skills"
