@@ -106,14 +106,20 @@ func handleTrackedRepoInstall(source *install.Source, cfg *config.Config, opts i
 		logSummary.InstalledSkills = append(logSummary.InstalledSkills, result.Skills...)
 	}
 
-	// Show next steps
+	// Show next steps. Skip the sync hint when the tracked repo had nothing
+	// to discover — suggesting "Run sync to distribute skills" when no skill
+	// was found is misleading.
 	if !opts.DryRun {
 		ui.SectionLabel("Next Steps")
 		if trackedKind == "agent" {
-			ui.Info("Run 'skillshare sync agents' to distribute agents to all targets")
+			if result.AgentCount > 0 {
+				ui.Info("Run 'skillshare sync agents' to distribute agents to all targets")
+			}
 			ui.Info("Run 'skillshare update agents --all' to update tracked agent repos later")
 		} else {
-			ui.Info("Run 'skillshare sync' to distribute skills to all targets")
+			if result.SkillCount > 0 {
+				ui.Info("Run 'skillshare sync' to distribute skills to all targets")
+			}
 			ui.Info("Run 'skillshare update %s' to update this repo later", result.RepoName)
 		}
 	}

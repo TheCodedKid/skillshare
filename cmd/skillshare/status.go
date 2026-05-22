@@ -319,15 +319,18 @@ func extractTrackedRepos(sourcePath string) []string {
 func buildTrackedRepoJSON(sourcePath string, trackedRepos []string, discovered []sync.DiscoveredSkill) []statusJSONRepo {
 	results := make([]statusJSONRepo, len(trackedRepos))
 
-	// Count skills per repo (single pass)
+	// Count skills per repo (single pass). A tracked repo may surface skills
+	// at the repo root (RelPath equals the repo name, no slash) or nested
+	// (RelPath has the form "<repo>/..."), so both shapes must be counted.
 	repoSkillCount := make(map[string]int, len(trackedRepos))
 	for _, d := range discovered {
 		if !d.IsInRepo {
 			continue
 		}
-		idx := strings.Index(d.RelPath, "/")
-		if idx > 0 {
+		if idx := strings.Index(d.RelPath, "/"); idx > 0 {
 			repoSkillCount[d.RelPath[:idx]]++
+		} else {
+			repoSkillCount[d.RelPath]++
 		}
 	}
 
