@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.19.20] - 2026-05-24
+
+### New Features
+
+#### Web UI process management
+
+- **`skillshare ui start` / `skillshare ui stop`** — run the web dashboard as a managed background process instead of holding a foreground shell. Re-running `start` reuses the existing healthy process; `stop` shuts it down using the remembered host/port. The legacy foreground `skillshare ui` and the `--no-open &` shell-backgrounding workaround keep working unchanged.
+  ```bash
+  skillshare ui start                 # start in background, return to shell
+  skillshare ui start --clear-cache   # clear cached UI assets, then start
+  skillshare ui stop                  # stop the background server
+  ```
+- **`--app` flag** — `skillshare ui start --app` opens the dashboard in a Chromium app-mode window (Chrome, Edge, Brave) so it gets its own Dock/taskbar entry and chrome-less frame on macOS, Windows, and Linux.
+
+#### In-place upgrade from the dashboard
+
+- **Update without leaving the browser** — the Update dialog and the Doctor page's Version card now show an **Update now** button. The dashboard runs `skillshare upgrade` on the host, restarts the local UI server, then auto-reloads the page once the new server reports healthy. Two new endpoints back this flow:
+  ```
+  POST /api/upgrade   # run skillshare upgrade in place
+  POST /api/restart   # restart the UI server (optional { "clearCache": true })
+  ```
+  If the dashboard cannot reconnect on its own, it surfaces a message asking you to run `skillshare ui start` to bring the background server back up.
+- **Doctor Version card redesign** — the version section now leads with a state-coloured icon (blue when an update is available, green when up to date), shows the version delta as `current → latest`, and hides the **Update now** button when there is nothing to upgrade.
+
+#### Installable as a Progressive Web App
+
+- **PWA support** — the dashboard now ships a `site.webmanifest`, app icons (192px / 512px), and a minimal service worker. Browsers that support it (Chrome, Edge, Safari, Brave) let you install Skillshare as a standalone desktop app from the address bar; offline cache covers the static shell so the dashboard opens even before the local server is reachable.
+
 ## [0.19.19] - 2026-05-23
 
 ### Bug Fixes

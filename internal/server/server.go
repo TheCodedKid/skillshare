@@ -429,8 +429,10 @@ func (s *Server) registerRoutes() {
 	// Repo uninstall
 	s.mux.HandleFunc("DELETE /api/repos/{name}", s.handleUninstallRepo)
 
-	// Version check
+	// Version check / app lifecycle
 	s.mux.HandleFunc("GET /api/version", s.handleVersionCheck)
+	s.mux.HandleFunc("POST /api/upgrade", s.handleUpgrade)
+	s.mux.HandleFunc("POST /api/restart", s.handleRestart)
 
 	// Doctor (health check)
 	s.mux.HandleFunc("GET /api/doctor", s.handleDoctor)

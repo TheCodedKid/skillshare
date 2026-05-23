@@ -1251,6 +1251,14 @@ func checkVersionDoctor(cfg *config.Config, result *doctorResult, isProject bool
 // proper semver comparison. Safe to call from a goroutine.
 func fetchDoctorUpdateResult() *versioncheck.CheckResult {
 	method := detectInstallMethod()
+	if version == "" || version == "dev" {
+		return &versioncheck.CheckResult{
+			CurrentVersion:  "dev",
+			LatestVersion:   "dev-ui-flow",
+			UpdateAvailable: true,
+			InstallMethod:   method,
+		}
+	}
 	return versioncheck.Check(version, method)
 }
 

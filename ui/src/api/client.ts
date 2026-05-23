@@ -448,8 +448,15 @@ export const api = {
       body: JSON.stringify(opts),
     }),
 
-  // Version check
+  // Version check / app lifecycle
   getVersionCheck: () => apiFetch<VersionCheck>('/version'),
+  upgradeApp: () => apiFetch<{ ok: boolean; updated: boolean; devMode?: boolean; latestVersion?: string; output?: string }>('/upgrade', { method: 'POST' }),
+  restartApp: (opts?: { clearCache?: boolean }) =>
+    apiFetch<{ ok: boolean; restarting: boolean }>('/restart', {
+      method: 'POST',
+      body: JSON.stringify({ clearCache: opts?.clearCache ?? true }),
+    }),
+  health: () => apiFetch<{ status: string; version: string; uptime_seconds: number }>('/health'),
 
   // Config
   getConfig: () => apiFetch<{ config: unknown; raw: string }>('/config'),
@@ -654,6 +661,7 @@ export interface VersionCheck {
   cliVersion: string;
   cliLatest?: string;
   cliUpdateAvailable: boolean;
+  cliDevMode?: boolean;
   skillVersion: string;
   skillLatest?: string;
   skillUpdateAvailable: boolean;
@@ -1182,6 +1190,7 @@ export interface DoctorVersion {
   current: string;
   latest?: string;
   update_available: boolean;
+  dev_mode?: boolean;
 }
 
 export interface DoctorResponse {

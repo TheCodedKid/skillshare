@@ -1239,6 +1239,11 @@
 
   "updateDialog.copyCommand": "Copy command",
   "updateDialog.newVersion": "New version available",
+  "updateDialog.restartDev": "DEV mode restart simulated.",
+  "updateDialog.restartManual": "Updated. Restart with skillshare ui start if this page does not reconnect.",
+  "updateDialog.restarting": "Restarting local UI server…",
+  "updateDialog.updateNow": "Update now",
+  "updateDialog.updating": "Updating Skillshare…",
 
   "tour.back": "Back",
   "tour.done": "Done",
