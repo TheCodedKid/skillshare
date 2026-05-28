@@ -276,6 +276,7 @@ Thanks to everyone who helped shape skillshare.
 <a href="https://github.com/aestilog"><img src="https://github.com/aestilog.png" width="50" style="border-radius:50%" alt="aestilog"></a>
 <a href="https://github.com/xarthurx"><img src="https://github.com/xarthurx.png" width="50" style="border-radius:50%" alt="xarthurx"></a>
 <a href="https://github.com/m0cun"><img src="https://github.com/m0cun.png" width="50" style="border-radius:50%" alt="m0cun"></a>
+<a href="https://github.com/bit3125"><img src="https://github.com/bit3125.png" width="50" style="border-radius:50%" alt="bit3125"></a>
 
 ---
 
