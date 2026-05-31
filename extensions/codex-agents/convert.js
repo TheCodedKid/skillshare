@@ -2,16 +2,30 @@
 const { block, convert } = require("./md-toml");
 
 convert(({ body, frontmatter, stem }) => {
-  if (!frontmatter.description || !frontmatter.description.trim()) {
+  const name = (frontmatter.name || stem).trim();
+  const description = (frontmatter.description || "").trim();
+  const developerInstructions = body.trim();
+
+  if (!name) {
+    throw new Error(
+      "codex-agents: missing required field 'name' (Codex custom agents require name)"
+    );
+  }
+  if (!description) {
     throw new Error(
       "codex-agents: missing required frontmatter 'description' (Codex custom agents require description)"
     );
   }
+  if (!developerInstructions) {
+    throw new Error(
+      "codex-agents: missing required markdown body (Codex custom agents require developer_instructions)"
+    );
+  }
 
   return {
-    name: frontmatter.name || stem,
-    description: frontmatter.description,
+    name,
+    description,
     model: frontmatter.model,
-    developer_instructions: block(body),
+    developer_instructions: block(developerInstructions),
   };
 });

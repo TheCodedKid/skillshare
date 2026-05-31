@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FolderOpen, FolderPlus, Lock, Plus, Puzzle, RefreshCw, Target, Trash2, X, Zap } from 'lucide-react';
 import { api } from '../api/client';
-import type { Extra, ExtrasSyncResult } from '../api/client';
+import type { Extra } from '../api/client';
 import { queryKeys, staleTimes } from '../lib/queryKeys';
 import { useAppContext } from '../context/AppContext';
 import { useToast } from '../components/Toast';
@@ -20,6 +20,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { PageSkeleton } from '../components/Skeleton';
 import Tooltip from '../components/Tooltip';
 import { useT } from '../i18n';
+import { buildSyncToast, sumAll, sumEntry, syncToastType } from '../lib/extrasSyncToast';
 
 // ─── AddExtraModal ────────────────────────────────────────────────────────────
 
@@ -484,62 +485,6 @@ function ExtraCard({
       </div>
     </Card>
   );
-}
-
-// ─── Sync result helpers ─────────────────────────────────────────────────────
-
-type SyncTotals = { synced: number; skipped: number; targets: number; errors: number };
-
-function sumEntry(entry: ExtrasSyncResult | undefined): SyncTotals {
-  if (!entry) return { synced: 0, skipped: 0, targets: 0, errors: 0 };
-  let synced = 0, skipped = 0, errors = 0;
-  for (const t of entry.targets) {
-    if (t.error) {
-      errors++;
-    } else {
-      synced += t.synced;
-      skipped += t.skipped;
-      errors += t.errors?.length ?? 0;
-    }
-  }
-  return { synced, skipped, targets: entry.targets.length, errors };
-}
-
-function sumAll(extras: ExtrasSyncResult[]): SyncTotals {
-  const totals: SyncTotals = { synced: 0, skipped: 0, targets: 0, errors: 0 };
-  for (const e of extras) {
-    const s = sumEntry(e);
-    totals.synced += s.synced;
-    totals.skipped += s.skipped;
-    totals.targets += s.targets;
-    totals.errors += s.errors;
-  }
-  return totals;
-}
-
-function syncToastType(t: SyncTotals): 'success' | 'warning' | 'error' {
-  if (t.errors > 0 && t.synced === 0) return 'error';
-  if (t.errors > 0) return 'warning';
-  if (t.skipped > 0 && t.synced === 0) return 'warning';
-  return 'success';
-}
-
-type TFunc = (key: string, params?: Record<string, any>, fallback?: string) => string;
-
-function buildSyncToast(label: string, failLabel: string, totals: SyncTotals, isForce: boolean, t: TFunc): string {
-  if (totals.errors > 0 && totals.synced === 0)
-    return `${failLabel} \u2014 ${t('extras.toast.nErrors', { errors: totals.errors }, `${totals.errors} error${totals.errors > 1 ? 's' : ''}`)}`;
-  if (totals.synced === 0 && totals.skipped === 0 && totals.errors === 0)
-    return `${label} \u2014 ${t('extras.toast.noFilesInSource', {}, 'no files in source')}`;
-  const parts: string[] = [];
-  parts.push(t('extras.toast.syncedNFiles', { synced: totals.synced, targets: totals.targets }, `${totals.synced} file${totals.synced !== 1 ? 's' : ''} to ${totals.targets} target${totals.targets !== 1 ? 's' : ''}`));
-  if (totals.skipped > 0)
-    parts.push(!isForce
-      ? t('extras.toast.skippedForce', { skipped: totals.skipped }, `${totals.skipped} skipped (enable Force to override)`)
-      : t('extras.toast.skipped', { skipped: totals.skipped }, `${totals.skipped} skipped`));
-  if (totals.errors > 0)
-    parts.push(t('extras.toast.nErrors', { errors: totals.errors }, `${totals.errors} error${totals.errors > 1 ? 's' : ''}`));
-  return `${label} \u2014 ${parts.join(', ')}`;
 }
 
 // ─── ExtrasPage ───────────────────────────────────────────────────────────────

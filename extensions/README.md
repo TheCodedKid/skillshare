@@ -89,7 +89,7 @@ convert(({ body, frontmatter, stem }) => ({
 }));
 ```
 
-For targets with required fields, validate them in `convert.js` and exit non-zero with a clear message. For example, Codex TOML agents require `description`, so `extensions/codex-agents` rejects inputs without `description` frontmatter instead of generating a TOML file that Codex cannot load.
+For targets with required fields, validate them in `convert.js` and exit non-zero with a clear message. For example, the [Codex custom agent schema](https://developers.openai.com/codex/subagents#custom-agent-file-schema) requires `name`, `description`, and `developer_instructions`, so `extensions/codex-agents` rejects inputs with blank names, blank descriptions, or empty Markdown bodies instead of generating a TOML file that Codex cannot load.
 
 Plain values become TOML strings:
 

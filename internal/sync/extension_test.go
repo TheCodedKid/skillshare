@@ -442,19 +442,12 @@ func TestSyncExtra_TransformRejectsNonCopyMode(t *testing.T) {
 }
 
 func TestBundledCodexAgentExtension_TransformsRequiredFields(t *testing.T) {
-	node := requireNode(t)
-	root := testRepoRoot(t)
-
-	cmd := exec.Command(node, filepath.Join(root, "extensions", "codex-agents", "convert.js"))
-	cmd.Env = append(os.Environ(), "SS_REL_PATH=reviewer.md")
-	cmd.Stdin = strings.NewReader("---\nname: reviewer\ndescription: Review PRs for correctness\nmodel: gpt-5.4\n---\nReview code like an owner.\n")
-
-	out, err := cmd.CombinedOutput()
+	out, err := runBundledCodexAgentExtension(t, "---\nname: \"  reviewer  \"\ndescription: \"  Review PRs for correctness  \"\nmodel: gpt-5.4\n---\nReview code like an owner.\n")
 	if err != nil {
 		t.Fatalf("codex-agents convert failed: %v\n%s", err, out)
 	}
 
-	got := string(out)
+	got := out
 	for _, want := range []string{
 		`name = "reviewer"`,
 		`description = "Review PRs for correctness"`,
@@ -468,10 +461,17 @@ func TestBundledCodexAgentExtension_TransformsRequiredFields(t *testing.T) {
 	}
 }
 
-func TestBundledCodexAgentExtension_RequiresDescription(t *testing.T) {
-	node := requireNode(t)
-	root := testRepoRoot(t)
+func TestBundledCodexAgentExtension_UsesStemWhenNameIsMissing(t *testing.T) {
+	out, err := runBundledCodexAgentExtension(t, "---\ndescription: Review PRs\n---\nReview code like an owner.\n")
+	if err != nil {
+		t.Fatalf("codex-agents convert failed: %v\n%s", err, out)
+	}
+	if !strings.Contains(out, `name = "reviewer"`) {
+		t.Fatalf("expected missing name to fall back to SS_REL_PATH stem, got:\n%s", out)
+	}
+}
 
+func TestBundledCodexAgentExtension_RequiresDescription(t *testing.T) {
 	for _, tc := range []struct {
 		name  string
 		input string
@@ -486,19 +486,62 @@ func TestBundledCodexAgentExtension_RequiresDescription(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			cmd := exec.Command(node, filepath.Join(root, "extensions", "codex-agents", "convert.js"))
-			cmd.Env = append(os.Environ(), "SS_REL_PATH=reviewer.md")
-			cmd.Stdin = strings.NewReader(tc.input)
-
-			out, err := cmd.CombinedOutput()
+			out, err := runBundledCodexAgentExtension(t, tc.input)
 			if err == nil {
 				t.Fatalf("expected missing description to fail, got success:\n%s", out)
 			}
-			if !strings.Contains(string(out), "missing required frontmatter 'description'") {
+			if !strings.Contains(out, "missing required frontmatter 'description'") {
 				t.Fatalf("expected missing description error, got:\n%s", out)
 			}
 		})
 	}
+}
+
+func TestBundledCodexAgentExtension_RequiresNameAndBody(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		input     string
+		wantError string
+	}{
+		{
+			name:      "whitespace-only-name",
+			input:     "---\nname: \"   \"\ndescription: Review PRs\n---\nReview code like an owner.\n",
+			wantError: "missing required field 'name'",
+		},
+		{
+			name:      "empty-body",
+			input:     "---\nname: reviewer\ndescription: Review PRs\n---\n",
+			wantError: "developer_instructions",
+		},
+		{
+			name:      "whitespace-only-body",
+			input:     "---\nname: reviewer\ndescription: Review PRs\n---\n   \n\t\n",
+			wantError: "developer_instructions",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			out, err := runBundledCodexAgentExtension(t, tc.input)
+			if err == nil {
+				t.Fatalf("expected required field check to fail, got success:\n%s", out)
+			}
+			if !strings.Contains(out, tc.wantError) {
+				t.Fatalf("expected error containing %q, got:\n%s", tc.wantError, out)
+			}
+		})
+	}
+}
+
+func runBundledCodexAgentExtension(t *testing.T, input string) (string, error) {
+	t.Helper()
+	node := requireNode(t)
+	root := testRepoRoot(t)
+
+	cmd := exec.Command(node, filepath.Join(root, "extensions", "codex-agents", "convert.js"))
+	cmd.Env = append(os.Environ(), "SS_REL_PATH=reviewer.md")
+	cmd.Stdin = strings.NewReader(input)
+
+	out, err := cmd.CombinedOutput()
+	return string(out), err
 }
 
 func requireNode(t *testing.T) string {
