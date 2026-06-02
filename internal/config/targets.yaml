@@ -298,6 +298,10 @@ targets:
     skills:
       global: "~/Library/Developer/Xcode/CodingAssistant/codex/skills"
       project: ".codex/skills"
+  - name: zed
+    skills:
+      global: "~/.agents/skills"
+      project: ".agents/skills"
   - name: zencoder
     skills:
       global: "~/.zencoder/skills"
