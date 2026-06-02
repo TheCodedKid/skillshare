@@ -506,6 +506,20 @@ func pruneExtraOrphans(targetPath string, sourceFiles map[string]bool, mode stri
 	return pruned, errors
 }
 
+// PruneExtraTarget removes all skillshare-managed files from a single extra
+// target directory. It is used when a target is removed from an extra: in
+// merge mode only symlinks are deleted (the user's own files are preserved);
+// in copy mode all managed files are removed. Empty parent directories are
+// cleaned up. An empty mode is treated as "merge".
+func PruneExtraTarget(targetPath, mode string) (pruned int, errors []string) {
+	if mode == "" {
+		mode = "merge"
+	}
+	// An empty source set means "nothing should remain" — every managed file
+	// under the target is an orphan and gets pruned.
+	return pruneExtraOrphans(targetPath, map[string]bool{}, mode)
+}
+
 // contentEqual returns true if two files have identical content.
 func contentEqual(a, b string) bool {
 	fa, err := os.Open(a)
