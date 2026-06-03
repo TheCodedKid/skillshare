@@ -852,7 +852,6 @@
   "search.hub.manageButton": "Manage",
   "search.hub.manageHubsButton": "Manage Hubs",
   "search.hub.noHubsConfigured": "No hubs configured. Add one to get started.",
-  "search.hub.submitPrPrompt": "Found an awesome skill? Submit a PR to",
   "search.input.filterPlaceholder": "Filter by name, description, or tag...",
   "search.input.placeholderGithub": "Search GitHub for skills...",
   "search.input.placeholderHub": "Search hub...",

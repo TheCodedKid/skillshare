@@ -927,7 +927,6 @@
   "search.hub.manageButton": "管理",
   "search.hub.manageHubsButton": "管理 Hubs",
   "search.hub.noHubsConfigured": "尚未設定任何 hub。新增一個以開始使用。",
-  "search.hub.submitPrPrompt": "找到很棒的 skill？提交 PR 到",
   "search.input.filterPlaceholder": "依名稱、描述或標籤篩選…",
   "search.input.placeholderGithub": "在 GitHub 搜尋 skills…",
   "search.input.placeholderHub": "搜尋 hub…",
