@@ -14,6 +14,8 @@
 ### Bug Fixes
 
 - **Project-mode agent symlinks are now relative** — `skillshare sync agents` created absolute symlinks in project mode, which broke when the repository was moved or checked out on another machine. Agent symlinks now use relative paths, matching how project skill symlinks already work.
+- **Factory alias syncs Droid agents correctly** — adding the Droid target by its `factory` alias now also resolves the built-in agents path, so `skillshare sync agents` writes custom droids to `~/.factory/droids` or `.factory/droids` instead of skipping the target as agentless.
+- **Web UI sync respects agent filters** — syncing from the dashboard now honors target-level `agents.include` and `agents.exclude` filters, matching the CLI. Agents that become excluded are pruned from target directories on the next sync. Refs: #211.
 
 ## [0.20.11] - 2026-06-10
 
