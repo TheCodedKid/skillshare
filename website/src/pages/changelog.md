@@ -9,6 +9,12 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.20.11] - 2026-06-10
+
+### Bug Fixes
+
+- **Grouped tracked repositories rehydrate at the correct path** — when `.metadata.json` contains tracked repos installed with `--track --into <group>`, `skillshare install` now restores the missing clone at the original grouped path instead of applying the group twice and failing on paths like `anthropics/anthropics/_skills`. Refs: #212.
+
 ## [0.20.10] - 2026-06-10
 
 ### Bug Fixes
