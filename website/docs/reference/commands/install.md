@@ -230,6 +230,16 @@ skillshare install anthropics/skills -s pdf --into tools -p
 skillshare install -p
 ```
 
+:::caution Don't install the project root into itself
+In project mode, installing a local path that resolves to the project root (e.g. `skillshare install ./ -p`) is rejected — copying the root into its own `.skillshare/skills/` subtree would recurse into the destination. Point at a specific skill subdirectory instead:
+
+```bash
+skillshare install ./my-skill -p
+```
+
+This guard applies to both the CLI and the Web UI ([`skillshare ui`](./ui.md)).
+:::
+
 ### How It Differs
 
 | | Global | Project (`-p`) |
