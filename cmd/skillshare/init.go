@@ -676,6 +676,8 @@ type detectedDir struct {
 	exists     bool // true if skills dir exists, false if only parent exists
 }
 
+const sharedSkillsDirectoryDescription = "Shared skills directory. Use this if your CLI supports ~/.agents/skills, such as Codex."
+
 // sliceHasName returns true if any element's name matches.
 func sliceHasName[T any](items []T, name string, getName func(T) string) bool {
 	for _, item := range items {
@@ -686,12 +688,27 @@ func sliceHasName[T any](items []T, name string, getName func(T) string) bool {
 	return false
 }
 
+func isSharedUniversalSkillsAlias(name string, target config.TargetConfig, defaultTargets map[string]config.TargetConfig) bool {
+	if name == "universal" {
+		return false
+	}
+	universal, ok := defaultTargets["universal"]
+	if !ok {
+		return false
+	}
+	return filepath.Clean(target.SkillsConfig().Path) == filepath.Clean(universal.SkillsConfig().Path)
+}
+
 func detectCLIDirectories(home string) []detectedDir {
 	ui.Header("Detecting CLI skills directories")
 	defaultTargets := config.DefaultTargets()
 	var detected []detectedDir
 
 	for name, target := range defaultTargets {
+		if isSharedUniversalSkillsAlias(name, target, defaultTargets) {
+			continue
+		}
+
 		sc := target.SkillsConfig()
 		if info, err := os.Stat(sc.Path); err == nil && info.IsDir() {
 			// Skills directory exists - count skills
@@ -711,6 +728,8 @@ func detectCLIDirectories(home string) []detectedDir {
 			})
 			if skillCount > 0 {
 				ui.Success("Found: %-12s %s (%d skills)", name, sc.Path, skillCount)
+			} else if name == "universal" {
+				ui.Info("Found: %-12s %s - %s", name, sc.Path, sharedSkillsDirectoryDescription)
 			} else {
 				ui.Info("Found: %-12s %s (empty)", name, sc.Path)
 			}
@@ -747,7 +766,7 @@ func detectCLIDirectories(home string) []detectedDir {
 			detected = append(detected, detectedDir{
 				name: "universal", path: uniPath,
 			})
-			ui.Info("Found: %-12s %s (shared agent directory)", "universal", uniPath)
+			ui.Info("Found: %-12s %s - %s", "universal", uniPath, sharedSkillsDirectoryDescription)
 		}
 	}
 
@@ -922,7 +941,7 @@ func buildTargetsList(detected []detectedDir, copyFrom, copyFromName, targetsArg
 	for i, d := range detected {
 		status := ""
 		if d.name == "universal" {
-			status = "(shared agent directory)"
+			status = sharedSkillsDirectoryDescription
 		} else if d.exists {
 			if d.skillCount > 0 {
 				status = fmt.Sprintf("(%d skills)", d.skillCount)
@@ -1531,6 +1550,10 @@ func detectNewAgents(existingCfg *config.Config) []agentInfo {
 	var newAgents []agentInfo
 
 	for name, target := range defaultTargets {
+		if isSharedUniversalSkillsAlias(name, target, defaultTargets) {
+			continue
+		}
+
 		if _, exists := existingCfg.Targets[name]; exists {
 			continue
 		}
@@ -1558,7 +1581,7 @@ func detectNewAgents(existingCfg *config.Config) []agentInfo {
 					newAgents = append(newAgents, agentInfo{
 						name:        "universal",
 						path:        target.SkillsConfig().Path,
-						description: "(shared agent directory)",
+						description: sharedSkillsDirectoryDescription,
 					})
 				}
 			}
